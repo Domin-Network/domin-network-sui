@@ -1,0 +1,30 @@
+---
+compiled_package_info:
+  package_name: DominNetwork
+  address_alias_instantiation:
+    domin_network: "0000000000000000000000000000000000000000000000000000000000000000"
+    std: "0000000000000000000000000000000000000000000000000000000000000001"
+    sui: "0000000000000000000000000000000000000000000000000000000000000002"
+  source_digest: 9A796BD213BEEB27BDA8FDA7976D73B3E59CEB205BFEBB5BA8E48273311E3507
+  build_flags:
+    dev_mode: true
+    test_mode: true
+    generate_docs: false
+    install_dir: ~
+    force_recompilation: false
+    lock_file: ~
+    fetch_deps_only: false
+    skip_fetch_latest_git_deps: false
+    default_flavor: sui
+    default_edition: ~
+    deps_as_root: false
+    silence_warnings: false
+    warnings_are_errors: false
+    json_errors: false
+    additional_named_addresses: {}
+    lint_flag:
+      no_lint: false
+      lint: false
+dependencies:
+  - MoveStdlib
+  - Sui
