@@ -37,4 +37,25 @@ module domin_network::authorizer {
     public fun get_version(authorizer: &Authorizer): u64 {
         authorizer.version
     }
+
+    #[test_only]
+    public fun test_init(ctx: &mut TxContext) {
+        let otw = AUTHORIZER {};
+        init(otw, ctx);
+    }
+
+    #[test_only]
+    public fun test_create_authorizer(
+        capability: &Capability,
+        ctx: &mut TxContext
+    ): Authorizer {
+        assert!(
+            capability_manager::get_role(capability) == ROLE,
+            EAuthorizerCapability
+        );
+        Authorizer {
+            id: object::new(ctx),
+            version: VERSION,
+        }
+    }
 }

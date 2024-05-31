@@ -1,9 +1,9 @@
 module domin_network::consumer_record {
     use sui::package;
     use domin_network::capability_manager::{Self, Capability};
-    // use domin_network::authorizer::Authorizer;
+    use domin_network::authorizer::Authorizer;
     use domin_network::operator::Operator;
-    use std::ascii::{ String };
+    use std::string::{ String };
 
     const VERSION: u64 = 1;
     const EConsumerRecordAuthorized: u64 = 0;
@@ -11,28 +11,28 @@ module domin_network::consumer_record {
 
     public struct CONSUMER_RECORD has drop {}
 
-    public struct ConsumerRecordPlatform has key, store {
+    public struct ConsumerRecordSource has key, store {
         id: UID,
         version: u64,
         name: String,
+        image: Option<String>,
         records: vector<ConsumerRecord>,
     }
 
-    // public struct ConsumerRecordDetail has key, store {
-    //     id: UID,
-    //     metadata: vector<u8>,
-    // }
+    public struct ConsumerRecordDetail has key, store {
+        id: UID,
+        asset_data: String,
+        metadata: String,
+    }
 
     public struct ConsumerRecord has key, store {
         id: UID,
-        // version: u64,
+        version: u64,
         operator_id: ID,
-        // authorizer_id: ID,
-        // consumer: vector<u8>,
-        // asset_data: vector<u8>,
-        // detail: ConsumerRecordDetail,
-        // timestamp: u64,
-        // owner: ID,
+        authorizer_id: ID,
+        consumer: String,
+        detail: ConsumerRecordDetail,
+        timestamp: u64,
         status: u8,
     }
 
@@ -43,9 +43,10 @@ module domin_network::consumer_record {
         package::claim_and_keep(otw, ctx);
     }
 
-    public entry fun create_platform(
+    public entry fun create_source(
         capability: &Capability,
         name: String,
+        image: Option<String>,
         ctx: &mut TxContext
     ) {
         assert!(
@@ -53,31 +54,47 @@ module domin_network::consumer_record {
             EConsumerRecordAuthorized
         );
         transfer::public_share_object(
-            ConsumerRecordPlatform {
+            ConsumerRecordSource {
                 id: object::new(ctx),
                 version: VERSION,
                 name: name,
+                image: image,
                 records: vector<ConsumerRecord>[],
             }
         );
     }
 
-    // public entry fun create_consumer_record(
-    //     platform: &ConsumerRecordPlatform,
-    //     authorizer: &Authorizer,
-    //     operator_id: ID,
-    //     consumer: vector<u8>,
-    //     asset_data: vector<u8>,
-    //     metadata: vector<u8>,
-    //     timestamp: u64,
-    //     owner: ID,
-    //     ctx: &mut TxContext
-    // ) {
-    //     let detail = ConsumerRecordDetail {
-    //         id: object::new(ctx),
-    //         metadata: metadata,
-    //     };
-    // }
+    public fun get_source_details(source: &ConsumerRecordSource): (String, Option<String>) {
+        (source.name, source.image)
+    }
+
+    public entry fun create_consumer_record(
+        authorizer: &Authorizer,
+        operator_id: ID,
+        source: &mut ConsumerRecordSource,
+        consumer: String,
+        asset_data: String,
+        metadata: String,
+        timestamp: u64,
+        ctx: &mut TxContext
+    ) {
+        let detail = ConsumerRecordDetail {
+            id: object::new(ctx),
+            asset_data: asset_data,
+            metadata: metadata,
+        };
+        let record = ConsumerRecord {
+            id: object::new(ctx),
+            version: VERSION,
+            operator_id: operator_id,
+            authorizer_id: object::id(authorizer),
+            consumer: consumer,
+            detail: detail,
+            timestamp: timestamp,
+            status: 0,
+        };
+        source.records.push_back(record);
+    }
 
     public entry fun update_status(
         operator: &Operator,
@@ -89,5 +106,11 @@ module domin_network::consumer_record {
             EConsumerRecordAuthorized
         );
         record.status = status;
+    }
+
+    #[test_only]
+    public fun test_init(ctx: &mut TxContext) {
+        let otw = CONSUMER_RECORD {};
+        init(otw, ctx);
     }
 }

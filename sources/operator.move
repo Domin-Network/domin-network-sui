@@ -37,4 +37,25 @@ module domin_network::operator {
     public fun get_version(operator: &Operator): u64 {
         operator.version
     }
+
+    #[test_only]
+    public fun test_init(ctx: &mut TxContext) {
+        let otw = OPERATOR {};
+        init(otw, ctx);
+    }
+
+    #[test_only]
+    public fun test_create_operator(
+        capability: &Capability,
+        ctx: &mut TxContext
+    ): Operator {
+        assert!(
+            capability_manager::get_role(capability) == ROLE,
+            EOperatorCapability
+        );
+        Operator {
+            id: object::new(ctx),
+            version: VERSION,
+        }
+    }
 }
