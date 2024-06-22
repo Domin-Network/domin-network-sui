@@ -39,13 +39,20 @@ module domin_network::staking_pool {
         staked_domin.principal.value()
     }
 
+    public use fun staked_domin_amount as StakedDomin.amount;
+
     public fun staked_domin_pool_id(staked_domin: &StakedDomin): ID {
         staked_domin.pool_id
     }
 
+    public use fun staked_domin_pool_id as StakedDomin.pool_id;
+
     public fun staking_pool_domin_balance(pool: &StakingPool): u64 {
         pool.domin_balance
     }
+
+    public use fun staking_pool_domin_balance as StakingPool.domin_balance;
+
 
     public fun stake(
         pool: &mut StakingPool,
@@ -87,18 +94,6 @@ module domin_network::staking_pool {
         object::delete(id);
         domin_balance
     }
-
-    // fun unwrap_staked_domin(staked_domin: StakedDomin): Balance<DOMIN> {
-    //     let StakedDomin {
-    //         id,
-    //         pool_id: _,
-    //         principal,
-    //     } = staked_domin;
-    //     object::delete(id);
-    //     principal
-    // }
-
-    // public use fun unwrap_staked_domin as StakedDomin.into_balance;
 
     #[test_only]
     public fun test_init(ctx: &mut TxContext) {

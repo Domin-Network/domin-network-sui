@@ -39,8 +39,8 @@ module domin_network::node_tests {
         let token_holder = @0xD;
         let mut scenario_values = test_scenario::begin(admin);
         let scenario = &mut scenario_values;
-        let authorizer_min_stake = 1_250_000;
-        let operator_min_stake = 125_000;
+        let authorizer_min_stake = 1_250_001;
+        let operator_min_stake = 125_001;
         let token_hodler_authorizer_stake = 50_000;
         let token_hodler_operator_stake = 5_000;
         {
@@ -168,6 +168,24 @@ module domin_network::node_tests {
                 coin::from_balance(domin_balance, ctx),
                 token_holder
             );
+        };
+        test_scenario::next_tx(scenario, authorizer_provider);
+        {
+            let pool = test_scenario::take_from_address<StakingPool>(
+                scenario, authorizer_provider
+            );
+            let ctx = test_scenario::ctx(scenario);
+            authorizer::create_authroizer(&pool, ctx);
+            test_scenario::return_to_address(authorizer_provider, pool);
+        };
+        test_scenario::next_tx(scenario, operator_provider);
+        {
+            let pool = test_scenario::take_from_address<StakingPool>(
+                scenario, operator_provider
+            );
+            let ctx = test_scenario::ctx(scenario);
+            operator::create_operator(&pool, ctx);
+            test_scenario::return_to_address(operator_provider, pool);
         };
         test_scenario::end(scenario_values);
     }
