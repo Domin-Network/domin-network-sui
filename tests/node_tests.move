@@ -4,7 +4,7 @@ module domin_network::node_tests {
     use sui::coin::{Self, Coin, TreasuryCap};
     use domin_network::authorizer;
     use domin_network::operator;
-    use domin_network::staking_pool::{Self, StakingPool};
+    use domin_network::staking_pool::{Self, StakingPool, StakedDomin};
     use domin_network::domin::{Self, DOMIN};
 
     #[test]
@@ -151,6 +151,23 @@ module domin_network::node_tests {
             );
             test_scenario::return_to_address(operator_provider, pool);
             transfer::public_transfer(staked_domin, token_holder);
+        };
+        test_scenario::next_tx(scenario, token_holder);
+        {
+            let mut pool = test_scenario::take_from_address<StakingPool>(
+                scenario, operator_provider
+            );
+            let staked_domin = test_scenario::take_from_sender<StakedDomin>(scenario);
+            let ctx = test_scenario::ctx(scenario);
+            let domin_balance = staking_pool::unstake(&mut pool, staked_domin);
+            assert!(
+                domin_balance.value() == token_hodler_operator_stake
+            );
+            test_scenario::return_to_address(operator_provider, pool);
+            transfer::public_transfer(
+                coin::from_balance(domin_balance, ctx),
+                token_holder
+            );
         };
         test_scenario::end(scenario_values);
     }

@@ -4,6 +4,7 @@ module domin_network::staking_pool {
     use domin_network::domin::{ DOMIN };
 
     const EStakingPoolOfZeroDomin: u64 = 0;
+    const EStakingPoolIdMismatch: u64 = 1;
 
     public struct STAKING_POOL has drop {}
 
@@ -64,6 +65,40 @@ module domin_network::staking_pool {
         pool.domin_balance = pool.domin_balance + domin_amount;
         staked_domin
     }
+
+    public fun unstake(
+        pool: &mut StakingPool,
+        staked_domin: StakedDomin,
+    ): Balance<DOMIN> {
+        let StakedDomin {
+            id: id,
+            pool_id: pool_id,
+            principal: domin_balance,
+        } = staked_domin;
+        assert!(
+            domin_balance.value() > 0,
+            EStakingPoolOfZeroDomin
+        );
+        assert!(
+            pool_id == object::id(pool),
+            EStakingPoolIdMismatch
+        );
+        pool.domin_balance = pool.domin_balance - domin_balance.value();
+        object::delete(id);
+        domin_balance
+    }
+
+    // fun unwrap_staked_domin(staked_domin: StakedDomin): Balance<DOMIN> {
+    //     let StakedDomin {
+    //         id,
+    //         pool_id: _,
+    //         principal,
+    //     } = staked_domin;
+    //     object::delete(id);
+    //     principal
+    // }
+
+    // public use fun unwrap_staked_domin as StakedDomin.into_balance;
 
     #[test_only]
     public fun test_init(ctx: &mut TxContext) {
