@@ -40,4 +40,12 @@ module domin_network::domin {
     public fun test_init(ctx: &mut TxContext) {
         init(DOMIN {}, ctx);
     }
+
+    public fun mint_for_testing(
+        treasury_cap: &mut TreasuryCap<DOMIN>,
+        amount: u64,
+        ctx: &mut TxContext
+    ): Coin<DOMIN> {
+        coin::mint(treasury_cap, amount, ctx)
+    }
 }

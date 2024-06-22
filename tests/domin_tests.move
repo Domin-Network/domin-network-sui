@@ -1,8 +1,8 @@
 #[test_only]
 module domin_network::domin_tests {
-    use domin_network::domin::{Self, DOMIN};
-    use sui::coin::{Self, TreasuryCap};
     use sui::test_scenario;
+    use sui::coin::{Self, TreasuryCap};
+    use domin_network::domin::{Self, DOMIN};
 
     #[test]
     public fun test_domin() {
