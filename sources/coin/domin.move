@@ -6,7 +6,7 @@ module domin_network::domin {
     fun init(otw: DOMIN, ctx: &mut TxContext) {
         let (treasury_cap, coin_metadata) = coin::create_currency<DOMIN>(
             otw,
-            8,
+            6,
             b"DOMIN",
             b"Domin",
             b"Domin Network currency",

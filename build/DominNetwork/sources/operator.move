@@ -2,7 +2,7 @@ module domin_network::operator {
     use sui::package;
     use domin_network::staking_pool::{ StakingPool };
 
-    const MIN_STAKE: u64 = 125_000;
+    const MIN_STAKE: u64 = 125_000_000_000;
 
     const EOperatorrNotEnoughStake: u64 = 0;
 
@@ -10,7 +10,7 @@ module domin_network::operator {
 
     public struct Operator has key {
         id: UID,
-        pool_id: ID,
+        pool: StakingPool
     }
 
     fun init(otw: OPERATOR, ctx: &mut TxContext) {
@@ -18,7 +18,7 @@ module domin_network::operator {
     }
 
     public fun create_operator(
-        pool: &StakingPool,
+        pool: StakingPool,
         ctx: &mut TxContext
     ) {
         let operator = new(pool, ctx);
@@ -26,17 +26,14 @@ module domin_network::operator {
     }
 
     fun new(
-        pool: &StakingPool,
+        pool: StakingPool,
         ctx: &mut TxContext
     ): Operator {
         assert!(
             pool.domin_balance() > MIN_STAKE,
             EOperatorrNotEnoughStake
         );
-        let operator = Operator {
-            id: object::new(ctx),
-            pool_id: object::id(pool),
-        };
+        let operator = Operator {id: object::new(ctx), pool: pool};
         operator
     }
 
@@ -48,7 +45,7 @@ module domin_network::operator {
 
     #[test_only]
     public fun create_operator_for_testing(
-        pool: &StakingPool,
+        pool: StakingPool,
         ctx: &mut TxContext
     ): Operator {
         new(pool, ctx)

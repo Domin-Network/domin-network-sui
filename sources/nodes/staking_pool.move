@@ -53,6 +53,12 @@ module domin_network::staking_pool {
 
     public use fun staking_pool_domin_balance as StakingPool.domin_balance;
 
+    public fun staking_pool_id(pool: &StakingPool): ID {
+        object::id(pool)
+    }
+
+    public use fun staking_pool_id as StakingPool.id;
+
     public fun stake(
         pool: &mut StakingPool,
         stake: Balance<DOMIN>,
